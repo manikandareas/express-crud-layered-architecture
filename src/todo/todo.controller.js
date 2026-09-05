@@ -1,5 +1,5 @@
 import express from "express";
-import { getTodos } from "./todo.service.js";
+import { getTodos, postTodo } from "./todo.service.js";
 
 const router = express.Router();
 
@@ -14,7 +14,7 @@ router.get("/", async (req, res) => {
   });
 });
 
-router.post("/", (req, res) => {
+router.post("/", async (req, res) => {
   const todo = req.body;
 
   if (!todo.title || todo.title?.length < 3) {
@@ -54,6 +54,27 @@ router.post("/", (req, res) => {
         {
           field: "due_date",
           message: "Field 'due_date' minimal harus lebih dari waktu saat ini",
+        },
+      ],
+    });
+  }
+
+  try {
+    const createdTodo = await postTodo(todo);
+
+    return res.status(201).send({
+      success: true,
+      message: "Todo berhasil dibuat",
+      data: createdTodo,
+    });
+  } catch (error) {
+    return res.status(505).send({
+      success: false,
+      message: error.message, // "Todo tidak berhasil disimpan
+      errors: [
+        {
+          field: "description",
+          message: "Field 'description' tidak boleh lebih dari 255 karakter",
         },
       ],
     });
