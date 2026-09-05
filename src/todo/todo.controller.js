@@ -43,21 +43,21 @@ router.post("/", (req, res) => {
     });
   }
 
-  // const due_date = req.body.due_date ? new Date(req.body.due_date) : null;
-  // const now = new Date();
+  const due_date = req.body.due_date ? new Date(req.body.due_date) : null;
+  const now = new Date();
 
-  // if (due_date?.getTime() < now.getTime()) {
-  //   return res.status(403).send({
-  //     success: false,
-  //     message: "Validasi input gagal",
-  //     errors: [
-  //       {
-  //         field: "due_date",
-  //         message: "Field 'due_date' minimal harus lebih dari waktu saat ini",
-  //       },
-  //     ],
-  //   });
-  // }
+  if (due_date?.getTime() < now.getTime()) {
+    return res.status(403).send({
+      success: false,
+      message: "Validasi input gagal",
+      errors: [
+        {
+          field: "due_date",
+          message: "Field 'due_date' minimal harus lebih dari waktu saat ini",
+        },
+      ],
+    });
+  }
 
   return res.send("POST TODO");
 });
