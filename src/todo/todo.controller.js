@@ -1,5 +1,10 @@
 import express from "express";
-import { getTodoByID, getTodos, postTodo } from "./todo.service.js";
+import {
+  getTodoByID,
+  getTodos,
+  postTodo,
+  putTodoByID,
+} from "./todo.service.js";
 
 const router = express.Router();
 
@@ -79,20 +84,16 @@ router.post("/", async (req, res) => {
       ],
     });
   }
-
-  return res.send("POST TODO");
 });
 
 // /todos/:id
 // /todos/123
 // /todos/1234
-
 router.get("/:id", async (req, res) => {
   const todoId = req.params.id;
 
   try {
     const todo = await getTodoByID(todoId);
-    console.log(todo);
     if (!todo) {
       // !todo | ![] | true
       return res.status(404).send({
@@ -116,8 +117,36 @@ router.get("/:id", async (req, res) => {
   }
 });
 
-router.put("/:id", (req, res) => {
-  return res.send("UPDATE TODO");
+router.put("/:id", async (req, res) => {
+  const todo = req.body;
+  const todoId = req.params.id;
+
+  if (
+    !(
+      todo.title &&
+      todo.description &&
+      todo.due_date &&
+      todo.priority &&
+      todo.is_completed
+    )
+  ) {
+    return res.status(400).send("Some fields are missing");
+  }
+
+  try {
+    const updatedTodo = await putTodoByID(todoId, todo);
+    return res.status(200).send({
+      success: true,
+      message: "Todo berhasil di update",
+      data: updatedTodo,
+    });
+  } catch (error) {
+    return res.status(500).send({
+      success: false,
+      message: error.message,
+      errors: [],
+    });
+  }
 });
 
 router.patch("/:id", (req, res) => {

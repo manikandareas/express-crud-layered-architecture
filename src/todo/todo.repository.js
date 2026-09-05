@@ -17,3 +17,19 @@ export const findTodoById = async (todoId) => {
   const [row] = await db.select().from(todos).where(eq(todos.id, todoId)); // equal | sama dengan. // [] bukan data satuan
   return row; // object | {}
 };
+
+export const updateTodo = async (todoId, todo) => {
+  await db
+    .update(todos)
+    .set({
+      title: todo.title,
+      description: todo.description,
+      due_date: todo.due_date,
+      priority: todo.priority,
+      is_completed: todo.is_completed,
+      updated_at: todo.updated_at,
+    })
+    .where(eq(todos.id, todoId));
+
+  return await findTodoById(todoId);
+};

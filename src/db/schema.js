@@ -16,7 +16,7 @@ export const products = mysqlTable("products", {
   description: text("description").notNull(),
   image: text("image").notNull(),
 });
-
+// todo dengan id 2
 export const todos = mysqlTable("todos", {
   id: varchar({ length: 128 }).$defaultFn(() => createId()), // UUID
   title: varchar({ length: 255 }),
