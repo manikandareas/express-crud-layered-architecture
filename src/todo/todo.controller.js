@@ -149,10 +149,12 @@ router.put("/:id", async (req, res) => {
   }
 });
 
+// SELESSAIKAN UPDATE UNTUK PATCH SAMAKAN AJA KAYAK PUT
 router.patch("/:id", (req, res) => {
   return res.send("TOGGLE STATUS TODO");
 });
 
+// TUGASNYA MENGHAPUS TODO BERDASARKAN ID, HARUS CEK DULU TODO BERDASARKAN ID ADA ATAU TIDAK BARU DIHAPUS
 router.delete("/:id", (req, res) => {
   return res.send("TODO DELETED");
 });
