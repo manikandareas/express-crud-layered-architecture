@@ -1,6 +1,7 @@
 import "dotenv/config";
 import express from "express";
 import productController from "./product/product.controller.js";
+import todoController from "./todo/todo.controller.js";
 
 const app = express();
 
@@ -13,6 +14,8 @@ app.get("/api", (req, res) => {
 });
 
 app.use("/products", productController);
+
+app.use("/todos", todoController);
 
 app.listen(PORT, () => {
   console.log("Express API running in port: " + PORT);

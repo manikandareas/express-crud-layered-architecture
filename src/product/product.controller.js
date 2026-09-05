@@ -19,11 +19,6 @@ router.get("/", async (req, res) => {
   res.send(products);
 });
 
-// baju 1 , baju 2, baju 3
-// baju 2, id dari si baju = 2
-
-// baju 2
-
 // /products/:id
 router.get("/:id", async (req, res) => {
   try {
