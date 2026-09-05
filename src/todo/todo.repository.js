@@ -8,10 +8,12 @@ export const findTodos = async () => {
 
 export const createTodo = async (todo) => {
   const [rowId] = await db.insert(todos).values(todo).$returningId();
-  const createdTodo = await getTodoByID(rowId);
+  const createdTodo = await findTodoById(rowId);
   return createdTodo;
 };
 
-export const getTodoByID = async (todoId) => {
-  return await db.select().from(todos).where(eq(todos.id, todoId)); // equal | sama dengan
+// throw new Error()
+export const findTodoById = async (todoId) => {
+  const [row] = await db.select().from(todos).where(eq(todos.id, todoId)); // equal | sama dengan. // [] bukan data satuan
+  return row; // object | {}
 };

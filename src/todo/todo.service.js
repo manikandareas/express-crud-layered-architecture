@@ -1,4 +1,4 @@
-import { createTodo, findTodos } from "./todo.repository.js";
+import { createTodo, findTodoById, findTodos } from "./todo.repository.js";
 
 export const getTodos = async () => {
   const todos = await findTodos();
@@ -22,4 +22,10 @@ export const postTodo = async (todo) => {
   }
 
   return createdTodo;
+};
+
+export const getTodoByID = async (todoId) => {
+  const todo = await findTodoById(todoId);
+
+  return todo;
 };
