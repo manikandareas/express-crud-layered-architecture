@@ -1,5 +1,6 @@
 import express from "express";
 import {
+  deleteTodoByID,
   getTodoByID,
   getTodos,
   postTodo,
@@ -8,14 +9,27 @@ import {
 
 const router = express.Router();
 
-// /todos
+// /todos?page=1&limit=10&offset=0
+
+// https://www.youtube.com/watch?v=wGjHvBlRpLo
 router.get("/", async (req, res) => {
-  const todos = await getTodos();
+  // page=10 -> 10 number
+  // page=ok -> error
+  // Number(req.query.page) || 1
+  // Number("gwjago") ? error dong itu bukan nomor
+  //  Number("gwjago") => nan => not a number
+
+  const page = Math.max(1, Number(req.query.page) || 1);
+  const limit = Math.max(1, Math.min(100, Number(req.query.limit) || 10));
+  const offset = (page - 1) * limit;
+
+  const result = await getTodos(page, limit, offset);
 
   return res.status(200).send({
     success: true,
     message: "Daftar todo berhasil diambil",
-    data: todos,
+    data: result.data,
+    meta: result.meta,
   });
 });
 
@@ -86,9 +100,6 @@ router.post("/", async (req, res) => {
   }
 });
 
-// /todos/:id
-// /todos/123
-// /todos/1234
 router.get("/:id", async (req, res) => {
   const todoId = req.params.id;
 
@@ -134,11 +145,20 @@ router.put("/:id", async (req, res) => {
   }
 
   try {
-    const updatedTodo = await putTodoByID(todoId, todo);
+    const result = await putTodoByID(todoId, todo);
+
+    if (result.status === 404) {
+      return res.status(404).send({
+        success: false,
+        message: "Todo dengan ID tersebut tidak ditemukan",
+        errors: [],
+      });
+    }
+    // naming | pemberian nama
     return res.status(200).send({
       success: true,
       message: "Todo berhasil di update",
-      data: updatedTodo,
+      data: result.data,
     });
   } catch (error) {
     return res.status(500).send({
@@ -149,22 +169,73 @@ router.put("/:id", async (req, res) => {
   }
 });
 
-// SELESSAIKAN UPDATE UNTUK PATCH SAMAKAN AJA KAYAK PUT
-router.patch("/:id", (req, res) => {
-  return res.send("TOGGLE STATUS TODO");
+router.patch("/:id", async (req, res) => {
+  const todo = req.body;
+  const todoId = req.params.id;
+
+  if (
+    !(
+      todo.title &&
+      todo.description &&
+      todo.due_date &&
+      todo.priority &&
+      todo.is_completed
+    )
+  ) {
+    return res.status(400).send("Some fields are missing");
+  }
+
+  try {
+    const result = await putTodoByID(todoId, todo);
+
+    if (result.status === 404) {
+      return res.status(404).send({
+        success: false,
+        message: "Todo dengan ID tersebut tidak ditemukan",
+        errors: [],
+      });
+    }
+    // naming | pemberian nama
+    return res.status(200).send({
+      success: true,
+      message: "Todo berhasil di update",
+      data: result.data,
+    });
+  } catch (error) {
+    return res.status(500).send({
+      success: false,
+      message: error.message,
+      errors: [],
+    });
+  }
 });
 
-// TUGASNYA MENGHAPUS TODO BERDASARKAN ID, HARUS CEK DULU TODO BERDASARKAN ID ADA ATAU TIDAK BARU DIHAPUS
-router.delete("/:id", (req, res) => {
-  // ADA KONDISI ID YANG DIKASIH ITU GADA DI DATABASE
+router.delete("/:id", async (req, res) => {
+  const todoId = req.params.id;
 
-  // KAMU HARUS CEK DULU DI DATABASE DATA NYA ADA ATAU GA
+  try {
+    const result = await deleteTodoByID(todoId);
 
-  // KALAU ADA ? LANJUTKAN OPERASI DELETE KE DATABASE
+    if (result.status === 404) {
+      return res.status(404).send({
+        success: false,
+        message: "Todo dengan ID tersebut tidak ditemukan",
+        errors: [],
+      });
+    }
 
-  // KALAU GADA ? RETURN DENGAN STATUS 404 KARENA DATA NOT FOUND
-
-  return res.send("TODO DELETED");
+    return res.status(200).send({
+      success: true,
+      message: "Todo berhasil dihapus",
+      data: null,
+    });
+  } catch (error) {
+    return res.status(500).send({
+      success: false,
+      message: error.message,
+      errors: [],
+    });
+  }
 });
 
 export default router;
